@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title or "Recipe Manager" }}</title>
+
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    /* 🌈 Background with soft shadow effect */
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Poppins", sans-serif;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        linear-gradient(rgba(25, 135, 84, 0.5), rgba(46, 184, 114, 0.5)),
+        url("https://images.unsplash.com/photo-1546069901-eacef0df6022?auto=format&fit=crop&w=1600&q=80");
+      background-size: cover;
+      background-position: center;
+      background-blend-mode: overlay;
+      animation: fadeIn 1s ease-in-out;
+      overflow: hidden;
+    }
+
+    /* ✨ Floating glowing circles */
+    .circle {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.35;
+      animation: float 8s ease-in-out infinite alternate;
+      z-index: 1;
+    }
+    .circle.one {
+      width: 320px; height: 320px;
+      background: #ffc107;
+      top: -80px; left: -100px;
+    }
+    .circle.two {
+      width: 350px; height: 350px;
+      background: #1dbf73;
+      bottom: -100px; right: -100px;
+      animation-delay: 2s;
+    }
+
+    @keyframes float { from { transform: translateY(0); } to { transform: translateY(-40px); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* 🧭 Navbar */
+    .navbar {
+      background-color: rgba(25, 135, 84, 0.9) !important;
+      position: absolute;
+      top: 0; width: 100%;
+      z-index: 3;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .navbar-brand { color: white !important; font-weight: 700; }
+    .nav-link { color: white !important; }
+    .nav-link:hover { color: #ffc107 !important; }
+
+    /* 🌟 Shared form styling */
+    .login-card {
+      position: relative;
+      z-index: 2;
+      width: 380px;
+      padding: 40px 30px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 45px rgba(255, 255, 255, 0.08);
+      text-align: center;
+      transition: all 0.4s ease;
+      animation: popUp 0.8s ease forwards;
+    }
+    .login-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 40px rgba(255, 193, 7, 0.6);
+    }
+    @keyframes popUp {
+      0% { transform: translateY(40px) scale(0.95); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* Input fields */
+    .form-control {
+      background: rgba(255, 255, 255, 0.25);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      padding: 14px 15px;
+      margin-bottom: 20px;
+    }
+    .form-control:focus {
+      box-shadow: 0 0 12px #ffc107;
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    label { color: #f8f8f8; font-weight: 500; }
+    .btn-warning {
+      background: linear-gradient(90deg, #ffc107, #ffdd57);
+      border: none;
+      font-weight: 600;
+      border-radius: 10px;
+      transition: 0.3s;
+      box-shadow: 0 4px 20px rgba(255, 193, 7, 0.4);
+    }
+    .btn-warning:hover {
+      transform: scale(1.07);
+      box-shadow: 0 8px 35px rgba(255, 193, 7, 0.7);
+    }
+
+    p, a { color: #fff; }
+    a { color: #ffc107; font-weight: 600; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+
+<body>
+  <div class="circle one"></div>
+  <div class="circle two"></div>
+
+  <!-- Navbar -->
+  {% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/">🍴 Recipe Manager</a>
+    <div class="collapse navbar-collapse justify-content-end">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+
+  {% block content %}{% endblock %}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,20 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>User Dashboard</title>
+  <meta charset="UTF-8">
+  <title>User Dashboard | Food & Recipe Manager</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: 
+        linear-gradient(rgba(25, 135, 84, 0.2), rgba(46, 184, 114, 0.2)),
+        url("https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1600&q=80");
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+      font-family: "Poppins", sans-serif;
+    }
+
+    /* Navbar Styling */
+    .navbar {
+      background: linear-gradient(90deg, #198754, #2eb872);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .navbar-brand {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* Main Section */
+    .dashboard-container {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      max-width: 800px;
+      margin: 5rem auto;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(5px);
+    }
+
+    .dashboard-container h2 {
+      color: #198754;
+    }
+
+    /* Buttons */
+    .dashboard-btn {
+      border: none;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .dashboard-btn.btn-success {
+      background: linear-gradient(90deg, #198754, #2eb872);
+      color: #fff;
+    }
+
+    .dashboard-btn.btn-success:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(25, 135, 84, 0.4);
+    }
+
+    .dashboard-btn.btn-warning {
+      background: linear-gradient(90deg, #f7b731, #ffc107);
+      color: #fff;
+    }
+
+    .dashboard-btn.btn-warning:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(255, 193, 7, 0.4);
+    }
+
+    /* Welcome text */
+    .welcome-text {
+      background: rgba(25, 135, 84, 0.1);
+      border-radius: 10px;
+      padding: 0.8rem 1.2rem;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
-  <nav class="navbar navbar-light bg-warning">
-    <div class="container">
-      <span class="navbar-brand mb-0 h1">🍳 Hello, {{ username }}</span>
-      <a href="/logoutuser" class="btn btn-dark">Logout</a>
+
+  <!-- 🌟 NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold text-white" href="#">🍴 Recipe Manager</a>
+      <div class="d-flex align-items-center">
+        <span class="me-3 text-white welcome-text">Welcome, {{ username }}</span>
+        <a href="{{ url_for('userLogout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+      </div>
     </div>
   </nav>
 
-  <div class="container mt-5 text-center">
-    <h2>Welcome to Your Recipe Dashboard</h2>
-    <p>You can add, view, and manage your recipes here.</p>
+  <!-- 🧾 MAIN CONTENT -->
+  <div class="dashboard-container text-center shadow-lg">
+    <h2 class="fw-bold mb-3">Your Recipe Dashboard</h2>
+    <p class="text-muted mb-4">Add, view, and manage your delicious recipes 🍽️</p>
+
+    <div class="row justify-content-center">
+      <div class="col-md-5 mb-3">
+        <a href="{{ url_for('add_recipe') }}" class="btn dashboard-btn btn-success w-100 py-3 fs-5 shadow-sm">
+          ➕ Add Recipe
+        </a>
+      </div>
+      <div class="col-md-5 mb-3">
+        <a href="{{ url_for('view_recipes') }}" class="btn dashboard-btn btn-warning w-100 py-3 fs-5 shadow-sm">
+          📖 View My Recipes
+        </a>
+      </div>
+    </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

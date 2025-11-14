@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Food & Recipe Manager</title>
+    <title>Food & Recipe Manager | Home</title>
 
     <!-- Bootstrap CSS -->
     <link
@@ -11,15 +11,145 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="../static/styles.css">
+    <!-- Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- Custom Styles -->
+    <style>
+      body {
+        scroll-behavior: smooth;
+      }
+
+      /* 🌟 Navbar */
+      .navbar {
+        background-color: #198754 !important; /* Bootstrap success */
+      }
+      .navbar-brand {
+        font-weight: 700;
+        color: #fff !important;
+      }
+      .nav-link {
+        color: #fff !important;
+        font-weight: 500;
+      }
+      .nav-link:hover {
+        color: #ffc107 !important;
+      }
+
+      /* 🍳 Hero Section */
+      .hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+          url('https://images.unsplash.com/photo-1504674900247-0877df9cc836')
+            center/cover no-repeat;
+        color: white;
+        text-align: center;
+        padding: 130px 20px;
+        animation: fadeIn 1.5s ease-in-out;
+      }
+
+      .hero h1 {
+        font-size: 2.8rem;
+        font-weight: 700;
+        animation: slideInDown 1s ease-out;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        margin: 15px 0 30px;
+        animation: fadeInUp 1.2s ease-out;
+      }
+
+      .btn-main {
+        background-color: #ffc107;
+        color: #000;
+        border: none;
+        font-weight: 600;
+        transition: transform 0.3s;
+      }
+      .btn-main:hover {
+        background-color: #ffca2c;
+        transform: scale(1.05);
+      }
+
+      /* 🍲 About Section */
+      .about {
+        padding: 80px 0;
+      }
+
+      /* ✨ Features */
+      .feature-card {
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* 💬 Testimonials */
+      .carousel-item {
+        text-align: center;
+        padding: 50px 0;
+      }
+      .carousel-item p {
+        font-style: italic;
+      }
+
+      /* 📢 CTA */
+      .cta {
+        background-color: #198754;
+        color: white;
+        padding: 60px 0;
+      }
+
+      /* 🦶 Footer */
+      footer {
+        background: #145c38;
+        color: white;
+        text-align: center;
+        padding: 20px 0;
+      }
+
+      /* 🎞️ Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes fadeInUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      @keyframes slideInDown {
+        from {
+          transform: translateY(-40px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+    </style>
   </head>
+
   <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-light fixed-top shadow-sm">
+    <!-- 🌟 Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
       <div class="container">
-        <a class="navbar-brand fw-bold text-warning" href="#">
-          🍽️ Food & Recipe Manager
-        </a>
+        <a class="navbar-brand" href="#">🍴 Recipe Manager</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -28,70 +158,84 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
-
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link text-dark" href="/">Home</a>
+              <a class="nav-link active" href="#">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-dark" href="/login">Login</a>
+              <a class="nav-link" href="/login">Login</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-dark" href="/register">Register</a>
+              <a class="nav-link" href="/register">Register</a>
             </li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
+    <!-- 🍳 Hero Section -->
+    <section class="hero">
       <div class="container">
         <h1>Welcome to Your Personal Food & Recipe Manager 🍳</h1>
         <p>
-          Discover, create, and manage your favorite recipes — all in one
-          simple place.
+          Organize, cook, and share your favorite recipes — anytime, anywhere.
         </p>
-        <a href="/login" class="btn btn-main me-2">Login</a>
-        <a href="/register" class="btn btn-outline-light">Register</a>
+        <a href="/login" class="btn btn-main me-3 px-4 py-2">Login</a>
+        <a href="/register" class="btn btn-outline-light px-4 py-2"
+          >Register</a
+        >
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
+    <!-- 🍲 About Section -->
+    <section class="about text-center bg-light">
       <div class="container">
-        <div class="text-center mb-5">
-          <h2 class="fw-bold text-dark">✨ Key Features</h2>
-          <p class="text-muted">Everything you need to stay organized in the kitchen</p>
-        </div>
+        <h2 class="text-success fw-bold mb-3">About Our Platform</h2>
+        <p class="text-muted">
+          Food & Recipe Manager helps you store and manage all your culinary
+          creations. Whether you’re a professional chef or a home cook, this app
+          makes your kitchen experience more delightful.
+        </p>
+      </div>
+    </section>
+
+    <!-- ✨ Features -->
+    <section class="py-5">
+      <div class="container text-center">
+        <h2 class="fw-bold text-success mb-4">✨ Key Features</h2>
         <div class="row">
           <div class="col-md-4 mb-4">
-            <div class="card feature-card p-4 text-center">
-              <h4>🍝 Add Recipes</h4>
+            <div class="card feature-card p-4">
+              <i class="bi bi-plus-circle-fill text-success fs-1 mb-3"></i>
+              <h5>Add Recipes</h5>
               <p>
-                Store your favorite recipes with ingredients, steps, and images
-                for easy access anytime.
+                Store recipes with ingredients, steps, and images — neatly and
+                securely.
               </p>
             </div>
           </div>
 
           <div class="col-md-4 mb-4">
-            <div class="card feature-card p-4 text-center">
-              <h4>👩‍🍳 Admin Control</h4>
+            <div class="card feature-card p-4">
+              <i class="bi bi-people-fill text-success fs-1 mb-3"></i>
+              <h5>Admin & User Roles</h5>
               <p>
-                Manage users and recipes efficiently with admin access for a
-                secure and smooth experience.
+                Enjoy secure access with separate user and admin functionalities.
               </p>
             </div>
           </div>
 
           <div class="col-md-4 mb-4">
-            <div class="card feature-card p-4 text-center">
-              <h4>📖 View & Share</h4>
+            <div class="card feature-card p-4">
+              <i class="bi bi-journal-text text-success fs-1 mb-3"></i>
+              <h5>Manage Recipes</h5>
               <p>
-                Browse your collection, edit recipes, and share your favorite
-                meals with your friends.
+                Easily edit, view, and delete your recipes anytime — all in one
+                place.
               </p>
             </div>
           </div>
@@ -99,10 +243,46 @@
       </div>
     </section>
 
-    <!-- Footer -->
+    <!-- 💬 Testimonials -->
+    <section class="bg-light py-5">
+      <div class="container text-center">
+        <h2 class="text-success fw-bold mb-4">💬 What Our Users Say</h2>
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <p>"This app made my cooking life so easy — I love organizing recipes here!"</p>
+              <h6 class="fw-bold text-success">— Priya, Home Chef</h6>
+            </div>
+            <div class="carousel-item">
+              <p>"Clean design and simple navigation. Highly recommended for foodies!"</p>
+              <h6 class="fw-bold text-success">— Rahul, Food Blogger</h6>
+            </div>
+            <div class="carousel-item">
+              <p>"The admin tools make managing recipes so smooth. Fantastic app!"</p>
+              <h6 class="fw-bold text-success">— Sneha, Restaurant Owner</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 📢 CTA Section -->
+    <section class="cta text-center">
+      <div class="container">
+        <h2 class="fw-bold mb-3">Start Your Culinary Journey Today! 🥘</h2>
+        <p class="mb-4">
+          Join thousands of users organizing their favorite recipes online.
+        </p>
+        <a href="/register" class="btn btn-warning px-4 py-2 me-3 fw-semibold">Register Now</a>
+        <a href="/login" class="btn btn-outline-light px-4 py-2">Login</a>
+      </div>
+    </section>
+
+    <!-- 🦶 Footer -->
     <footer>
       <p class="mb-0">
-        © 2025 Food & Recipe Manager | Developed by <b>Manasa Kandikanti</b>
+        © 2025 Food & Recipe Manager | Developed by
+        <b>Prithvi Roshan</b> 💚
       </p>
     </footer>
 

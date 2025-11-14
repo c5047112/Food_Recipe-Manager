@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Edit Recipe{% endblock %}
+
+{% block content %}
+<h2 class="text-center text-success mb-4">✏️ Edit Recipe</h2>
+
+<form method="POST" class="card p-4 shadow-sm mx-auto" style="max-width: 700px;">
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" name="title" class="form-control" value="{{ recipe[1] }}" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Ingredients</label>
+    <textarea name="ingredients" class="form-control" rows="3" required>{{ recipe[2] }}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Instructions</label>
+    <textarea name="instructions" class="form-control" rows="4" required>{{ recipe[3] }}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Category</label>
+    <input type="text" name="category" class="form-control" value="{{ recipe[4] }}">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Image URL</label>
+    <input type="text" name="image_url" class="form-control" value="{{ recipe[5] }}">
+  </div>
+
+  <div class="text-center mt-4">
+    <button type="submit" class="btn btn-success px-4">💾 Save Changes</button>
+    <a href="{{ url_for('view_recipes') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+  </div>
+</form>
+{% endblock %}
