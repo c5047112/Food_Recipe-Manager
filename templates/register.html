@@ -53,6 +53,12 @@
     box-shadow: 0 0 12px #ffc107;
     background: rgba(255, 255, 255, 0.35);
   }
+
+  .pending-note {
+    font-size: 0.9rem;
+    color: #ffc107;
+    margin-top: 10px;
+  }
 </style>
 
 <div class="login-card">
@@ -77,9 +83,25 @@
     <button type="submit" class="btn btn-warning w-100">Register</button>
   </form>
 
+  <p class="pending-note">
+    ⚠️ After registration, your account will need admin approval before you can log in.
+  </p>
+
   <p class="mt-3">
     Already have an account?
     <a href="/login">Login</a>
   </p>
 </div>
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 {% endblock %}

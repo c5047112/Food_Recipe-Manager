@@ -1,338 +1,387 @@
-# ------------------------------------------------------------
-# 🍽️ FOOD & RECIPE MANAGER — Flask Application
-# ------------------------------------------------------------
-# Features:
-# ✅ User Registration & Login (with hashed passwords)
-# ✅ Role-based access (Admin/User)
-# ✅ Add, View, Edit, Delete Recipes
-# ✅ SQLite database
-# ✅ Flash messages for user feedback
-# ✅ Content-block based templates (Jinja2)
-# ------------------------------------------------------------
-
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# ------------------------------------------------------------
-# ⚙️ Flask App Configuration
-# ------------------------------------------------------------
 app = Flask(__name__)
-app.secret_key = "supersecretkey"  # Used for session and flash message encryption
-
-DB_PATH = 'recipe.db'  # SQLite database file path
+app.secret_key = "supersecretkey"
 
 
-# ------------------------------------------------------------
-# 🧱 DATABASE INITIALIZATION
-# ------------------------------------------------------------
-def init_db():
-    """Creates required tables if they don’t exist and adds a default admin."""
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-
-    # USERS TABLE
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        role TEXT NOT NULL DEFAULT 'user'
-    )''')
-
-    # RECIPES TABLE
-    c.execute('''CREATE TABLE IF NOT EXISTS recipes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        ingredients TEXT NOT NULL,
-        instructions TEXT NOT NULL,
-        category TEXT,
-        image_url TEXT,
-        created_by INTEGER,
-        FOREIGN KEY(created_by) REFERENCES users(id)
-    )''')
-
-    # Default Admin (if not already present)
-    c.execute("SELECT * FROM users WHERE role='admin'")
-    if not c.fetchone():
-        admin_pass = generate_password_hash('admin@1004')
-        c.execute(
-            "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)",
-            ('admin', 'admin1004@gmail.com', admin_pass, 'admin')
-        )
-        print("✅ Default admin created → Email: admin1004@gmail.com | Password: admin@1004")
-
-    conn.commit()
-    conn.close()
+# ---------------------------------------------
+# DATABASE CONNECTION
+# ---------------------------------------------
+def get_db_connection():
+    conn = sqlite3.connect("recipe.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
-# ------------------------------------------------------------
-# 🧍‍♂️ USER REGISTRATION
-# ------------------------------------------------------------
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    """Allows new users to register and stores their info securely."""
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+# ---------------------------------------------
+# HOME
+# ---------------------------------------------
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-        conn = sqlite3.connect(DB_PATH)
+
+# ---------------------------------------------
+# USER SIGNUP
+# ---------------------------------------------
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        username = request.form["username"]
+        email = request.form["email"]
+        password = generate_password_hash(request.form["password"])
+
+        conn = get_db_connection()
         c = conn.cursor()
 
-        # Check if user already exists
-        c.execute("SELECT * FROM users WHERE email=?", (email,))
-        existing_user = c.fetchone()
+        c.execute("""
+            INSERT INTO users (username, email, password, is_approved, is_admin)
+            VALUES (?, ?, ?, 0, 0)
+        """, (username, email, password))
 
-        if existing_user:
-            flash("Email already exists! Try logging in.", "warning")
-            conn.close()
-            return redirect(url_for('login'))
-
-        # Hash password before saving
-        hashed_password = generate_password_hash(password)
-        c.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-                  (username, email, hashed_password))
         conn.commit()
         conn.close()
 
-        flash("Registration successful! Please log in.", "success")
-        return redirect(url_for('login'))
+        flash("Signup successful! Wait for admin approval.", "success")
+        return redirect(url_for("login"))
 
-    return render_template('register.html')
+    return render_template("signup.html")
 
 
-# ------------------------------------------------------------
-# 🔐 USER LOGIN
-# ------------------------------------------------------------
-@app.route('/login', methods=['GET', 'POST'])
+# ---------------------------------------------
+# LOGIN
+# ---------------------------------------------
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    """Handles user login with password verification."""
-    if request.method == 'POST':
-        email = request.form['email'].strip()
-        password = request.form['password'].strip()
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form["password"]
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = get_db_connection()
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE email=?", (email,))
+        c.execute("SELECT * FROM users WHERE email = ?", (email,))
         user = c.fetchone()
         conn.close()
 
-        # Validate user and password
-        if not user:
-            flash("Email not found! Please register first.", "warning")
-            return redirect(url_for('register'))
+        if user and check_password_hash(user["password"], password):
 
-        if check_password_hash(user[3], password):
-            session['user_id'] = user[0]
-            session['username'] = user[1]
-            session['role'] = user[4]
+            session["user_id"] = user["id"]
+            session["username"] = user["username"]
+            session["is_admin"] = user["is_admin"]
 
-            flash("Login successful! Welcome back!", "success")
-            if user[4] == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            return redirect(url_for('user_dashboard'))
-        else:
-            flash("Incorrect password! Please try again.", "danger")
-            return redirect(url_for('login'))
+            # Admin login
+            if user["is_admin"] == 1:
+                return redirect(url_for("admin_dashboard"))
 
-    return render_template('login.html')
+            # Normal user but not approved yet
+            if user["is_approved"] == 0:
+                flash("Admin approval required!", "danger")
+                return redirect(url_for("login"))
 
+            return redirect(url_for("user_dashboard"))
 
-# ------------------------------------------------------------
-# 🏠 HOME PAGE
-# ------------------------------------------------------------
-@app.route('/')
-def home():
-    """Home page (public)."""
-    return render_template('index.html')
+        flash("Invalid email or password!", "danger")
+
+    return render_template("login.html")
 
 
-# ------------------------------------------------------------
-# 👤 USER DASHBOARD
-# ------------------------------------------------------------
-@app.route('/user_dashboard')
+# ---------------------------------------------
+# LOGOUT
+# ---------------------------------------------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+# ---------------------------------------------
+# USER DASHBOARD
+# ---------------------------------------------
+@app.route("/user_dashboard")
 def user_dashboard():
-    """Dashboard shown after successful login."""
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return render_template('user_dashboard.html', username=session['username'])
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    return render_template("user_dashboard.html", username=session["username"])
 
 
-# ------------------------------------------------------------
-# 🍳 ADD RECIPE
-# ------------------------------------------------------------
-@app.route('/add_recipe', methods=['GET', 'POST'])
+# ---------------------------------------------
+# ADD RECIPE
+# ---------------------------------------------
+@app.route("/add_recipe", methods=["GET", "POST"])
 def add_recipe():
-    """Allows users to add new recipes."""
-    if 'user_id' not in session:
-        flash("Please log in to add a recipe.", "warning")
-        return redirect(url_for('login'))
+    if "user_id" not in session:
+        return redirect("/login")
 
-    if request.method == 'POST':
-        title = request.form['title']
-        ingredients = request.form['ingredients']
-        instructions = request.form['instructions']
-        category = request.form['category']
-        image_url = request.form['image_url']
+    if request.method == "POST":
+        title = request.form["title"]
+        ingredients = request.form["ingredients"]
+        instructions = request.form["instructions"]
+        category = request.form["category"]
+        image_url = request.form["image_url"]
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = get_db_connection()
         c = conn.cursor()
-        c.execute('''
-            INSERT INTO recipes (title, ingredients, instructions, category, image_url, created_by)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (title, ingredients, instructions, category, image_url, session['user_id']))
+
+        c.execute("""
+            INSERT INTO recipes 
+            (title, ingredients, instructions, category, image_url, user_id, delete_request)
+            VALUES (?, ?, ?, ?, ?, ?, 0)
+        """, (title, ingredients, instructions, category, image_url, session["user_id"]))
+
         conn.commit()
         conn.close()
 
         flash("Recipe added successfully!", "success")
-        return redirect(url_for('view_recipes'))
+        return redirect(url_for("view_recipes"))
 
-    return render_template('add_recipe.html', username=session['username'])
+    return render_template("add_recipe.html", username=session["username"])
 
 
-# ------------------------------------------------------------
-# 📖 VIEW RECIPES
-# ------------------------------------------------------------
-@app.route('/view_recipes')
+# ---------------------------------------------
+# VIEW USER RECIPES
+# ---------------------------------------------
+@app.route("/view_recipes")
 def view_recipes():
-    """Displays recipes created by the logged-in user."""
-    if 'user_id' not in session:
-        flash("Please log in to view your recipes.", "warning")
-        return redirect(url_for('login'))
+    if "user_id" not in session:
+        return redirect(url_for("login"))
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT * FROM recipes WHERE created_by=?", (session['user_id'],))
+
+    # USER SHOULD SEE ALL RECIPES EVEN IF delete_request = 1
+    c.execute("SELECT * FROM recipes WHERE user_id = ?", (session["user_id"],))
     recipes = c.fetchall()
+
     conn.close()
 
-    return render_template('view_recipes.html', recipes=recipes, username=session['username'])
+    return render_template("view_recipes.html",
+                           recipes=recipes,
+                           username=session["username"])
 
 
-# ------------------------------------------------------------
-# ✏️ EDIT RECIPE
-# ------------------------------------------------------------
-@app.route('/edit_recipe/<int:recipe_id>', methods=['GET', 'POST'])
-def edit_recipe(recipe_id):
-    """Allows the user to edit their recipe."""
-    if 'user_id' not in session:
-        flash("Please log in first.", "warning")
-        return redirect(url_for('login'))
-
-    conn = sqlite3.connect(DB_PATH)
+# ---------------------------------------------
+# VIEW SINGLE RECIPE
+# ---------------------------------------------
+@app.route("/recipe/<int:recipe_id>")
+def view_recipe(recipe_id):
+    conn = get_db_connection()
     c = conn.cursor()
 
-    # Handle form submission
-    if request.method == 'POST':
-        title = request.form['title']
-        ingredients = request.form['ingredients']
-        instructions = request.form['instructions']
-        category = request.form['category']
-        image_url = request.form['image_url']
+    c.execute("SELECT * FROM recipes WHERE id = ?", (recipe_id,))
+    recipe = c.fetchone()
 
-        c.execute('''UPDATE recipes 
-                     SET title=?, ingredients=?, instructions=?, category=?, image_url=? 
-                     WHERE id=? AND created_by=?''',
-                  (title, ingredients, instructions, category, image_url, recipe_id, session['user_id']))
+    conn.close()
+
+    return render_template("view_recipe.html",
+                           recipe=recipe,
+                           username=session.get("username"))
+
+
+# ---------------------------------------------
+# EDIT RECIPE
+# ---------------------------------------------
+@app.route("/edit_recipe/<int:recipe_id>", methods=["GET", "POST"])
+def edit_recipe(recipe_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM recipes WHERE id = ?", (recipe_id,))
+    recipe = c.fetchone()
+
+    if request.method == "POST":
+        title = request.form["title"]
+        ingredients = request.form["ingredients"]
+        instructions = request.form["instructions"]
+        category = request.form["category"]
+        image_url = request.form["image_url"]
+
+        c.execute("""
+            UPDATE recipes 
+            SET title=?, ingredients=?, instructions=?, category=?, image_url=?
+            WHERE id=?
+        """, (title, ingredients, instructions, category, image_url, recipe_id))
+
         conn.commit()
         conn.close()
 
         flash("Recipe updated successfully!", "success")
-        return redirect(url_for('view_recipes'))
+        return redirect(url_for("view_recipes"))
 
-    # GET request → fetch the existing recipe data
-    c.execute("SELECT * FROM recipes WHERE id=? AND created_by=?", (recipe_id, session['user_id']))
-    recipe = c.fetchone()
     conn.close()
-
-    if not recipe:
-        flash("Recipe not found or unauthorized access.", "danger")
-        return redirect(url_for('view_recipes'))
-
-    return render_template('edit_recipe.html', recipe=recipe)
+    return render_template("edit.html", recipe=recipe)
 
 
-# ------------------------------------------------------------
-# 🗑 DELETE RECIPE
-# ------------------------------------------------------------
-@app.route('/delete_recipe/<int:recipe_id>', methods=['POST'])
+# ==========================================================
+# USER DELETE REQUEST (NOT REAL DELETE)
+# ==========================================================
+@app.route("/delete_recipe/<int:recipe_id>", methods=["POST"])
 def delete_recipe(recipe_id):
-    """Deletes a recipe belonging to the logged-in user."""
-    if 'user_id' not in session:
-        flash("Please log in first.", "warning")
-        return redirect(url_for('login'))
+    """User sends delete request, recipe not deleted yet"""
+    if "user_id" not in session:
+        return redirect(url_for("login"))
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     c = conn.cursor()
-    c.execute("DELETE FROM recipes WHERE id=? AND created_by=?", (recipe_id, session['user_id']))
+
+    c.execute("""
+        UPDATE recipes SET delete_request = 1
+        WHERE id = ? AND user_id = ?
+    """, (recipe_id, session["user_id"]))
+
     conn.commit()
     conn.close()
 
-    flash("Recipe deleted successfully!", "info")
-    return redirect(url_for('view_recipes'))
+    flash("Delete request sent to admin!", "warning")
+    return redirect(url_for("view_recipes"))
 
-# ------------------------------------------------------------
-# 👁 VIEW SINGLE RECIPE (FULL DETAILS)
-# ------------------------------------------------------------
-@app.route('/recipe/<int:recipe_id>')
-def recipe_detail(recipe_id):
-    """Displays full details of a single recipe."""
-    if 'user_id' not in session:
-        flash("Please log in to view this recipe.", "warning")
-        return redirect(url_for('login'))
 
-    conn = sqlite3.connect(DB_PATH)
+# ==========================================================
+# ADMIN DASHBOARD (SHOW ALL USERS & RECIPES COUNT)
+# ==========================================================
+@app.route("/admin_dashboard")
+def admin_dashboard():
+    if "is_admin" not in session or session["is_admin"] != 1:
+        return redirect("/login")
+
+    conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT * FROM recipes WHERE id=? AND created_by=?", (recipe_id, session['user_id']))
-    recipe = c.fetchone()
+
+    c.execute("""
+        SELECT users.id, users.username, users.email,
+               COUNT(recipes.id) AS recipe_count
+        FROM users
+        LEFT JOIN recipes ON users.id = recipes.user_id
+        WHERE users.is_admin = 0
+        GROUP BY users.id
+    """)
+    users = c.fetchall()
+
     conn.close()
 
-    if not recipe:
-        flash("Recipe not found or unauthorized access.", "danger")
-        return redirect(url_for('view_recipes'))
-
-    return render_template('View_RecipeInfo.html', recipe=recipe, username=session['username'])
+    return render_template("admin_dashboard.html",
+                           users=users,
+                           username=session["username"])
 
 
+# ==========================================================
+# ADMIN REQUESTS PAGE 
+# ==========================================================
+@app.route("/admin_requests")
+def admin_requests():
+    if "is_admin" not in session or session["is_admin"] != 1:
+        return redirect("/login")
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    # Users waiting for approval
+    c.execute("SELECT * FROM users WHERE is_approved = 0 AND is_admin = 0")
+    pending_users = c.fetchall()
+
+    # Recipes marked for delete
+    c.execute("""
+        SELECT recipes.*, users.username
+        FROM recipes
+        JOIN users ON recipes.user_id = users.id
+        WHERE delete_request = 1
+    """)
+    pending_deletes = c.fetchall()
+
+    conn.close()
+
+    return render_template("admin_requests.html",
+                           pending_users=pending_users,
+                           pending_deletes=pending_deletes,
+                           username=session["username"])
 
 
-# ------------------------------------------------------------
-# 👑 ADMIN DASHBOARD
-# ------------------------------------------------------------
-@app.route('/admin_dashboard')
-def admin_dashboard():
-    """Admin-only dashboard."""
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('login'))
-    return render_template('admin_dashboard.html', username=session['username'])
+# ==========================================================
+# ADMIN: APPROVE / REJECT USER
+# ==========================================================
+@app.route("/admin/approve_user/<int:user_id>", methods=["POST"])
+def admin_approve_user(user_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("UPDATE users SET is_approved = 1 WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    flash("User approved!", "success")
+    return redirect(url_for("admin_requests"))
 
 
-# ------------------------------------------------------------
-# 🚪 LOGOUT (USER)
-# ------------------------------------------------------------
-@app.route('/logoutuser')
-def userLogout():
-    """Logs out a normal user."""
-    session.clear()
-    flash("You have been logged out.", "info")
-    return redirect(url_for('home'))
+@app.route("/admin/reject_user/<int:user_id>", methods=["POST"])
+def admin_reject_user(user_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    flash("User rejected!", "danger")
+    return redirect(url_for("admin_requests"))
 
 
-# ------------------------------------------------------------
-# 🚪 LOGOUT (ADMIN)
-# ------------------------------------------------------------
-@app.route('/logoutadmin')
-def adminLogout():
-    """Logs out the admin."""
-    session.clear()
-    flash("Admin logged out successfully.", "info")
-    return redirect(url_for('login'))
+# ==========================================================
+# ADMIN: DELETE RECIPE APPROVAL
+# ==========================================================
+@app.route("/admin/approve_delete/<int:recipe_id>", methods=["POST"])
+def admin_approve_delete(recipe_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("DELETE FROM recipes WHERE id = ?", (recipe_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Recipe deleted!", "danger")
+    return redirect(url_for("admin_requests"))
 
 
-# ------------------------------------------------------------
-# 🚀 RUN THE APP
-# ------------------------------------------------------------
-if __name__ == '__main__':
-    init_db()
+@app.route("/admin/reject_delete/<int:recipe_id>", methods=["POST"])
+def admin_reject_delete(recipe_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("UPDATE recipes SET delete_request = 0 WHERE id = ?", (recipe_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Delete request rejected!", "info")
+    return redirect(url_for("admin_requests"))
+
+
+# ==========================================================
+# ADMIN: GET RECIPES OF A USER
+# ==========================================================
+@app.route("/admin/get_user_recipes/<int:user_id>")
+def admin_get_user_recipes(user_id):
+    if "is_admin" not in session or session["is_admin"] != 1:
+        return {"error": "Unauthorized"}, 403
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT id, title, category
+        FROM recipes
+        WHERE user_id = ?
+    """, (user_id,))
+    recipes = c.fetchall()
+    conn.close()
+
+    return {"recipes": [
+        {"id": r["id"], "title": r["title"], "category": r["category"]}
+        for r in recipes
+    ]}
+
+
+# ---------------------------------------------
+# RUN APP
+# ---------------------------------------------
+if __name__ == "__main__":
     app.run(debug=True)
