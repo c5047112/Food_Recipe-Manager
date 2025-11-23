@@ -237,7 +237,7 @@ def view_recipe(recipe_id):
 
     # ✅ Fetch recipe + creator username
     c.execute("""
-        SELECT recipes.*, users.username
+        SELECT recipes.*, users.username AS creator_username
         FROM recipes
         LEFT JOIN users ON recipes.user_id = users.id
         WHERE recipes.id = ?
@@ -246,7 +246,7 @@ def view_recipe(recipe_id):
 
     # ✅ Fetch reviews + reviewer username
     c.execute("""
-        SELECT reviews.*, users.username
+        SELECT reviews.*, users.username AS reviewer_username
         FROM reviews
         JOIN users ON reviews.user_id = users.id
         WHERE recipe_id = ?
@@ -254,7 +254,7 @@ def view_recipe(recipe_id):
     """, (recipe_id,))
     reviews = c.fetchall()
 
-    # ✅ Fetch average rating + total review count
+    # ✅ Get avg rating + count
     c.execute("""
         SELECT 
             ROUND(AVG(rating), 1) AS avg_rating,
@@ -270,14 +270,13 @@ def view_recipe(recipe_id):
     conn.close()
 
     return render_template(
-    "view_RecipeInfo.html",
-    recipe=recipe,
-    username=session["username"],
-    reviews=reviews,
-    avg_rating=avg_rating,
-    total_reviews=total_reviews
+        "view_RecipeInfo.html",
+        recipe=recipe,
+        username=session.get("username"),
+        reviews=reviews,
+        avg_rating=avg_rating,
+        total_reviews=total_reviews
     )
-
 
 
 @app.route("/recipe/<int:recipe_id>/add_review", methods=["POST"])
