@@ -3,115 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ recipe[1] }} - Recipe Details</title>
+  <title>{{ recipe['title'] }} - Recipe Details</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
     body {
       background: linear-gradient(135deg, #e8fff1, #f7fdfc);
-      margin: 0;
-      padding: 0;
       font-family: "Poppins", sans-serif;
     }
-
-    /* NAVBAR */
     .navbar {
       background: linear-gradient(90deg, #198754, #27c284);
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
     }
-
-    /* EXTRA SPACE BELOW NAVBAR */
-    .top-space {
-      height: 110px;   /* Increased from 85px */
-    }
-
-    /* Recipe Card */
+    .top-space { height: 110px; }
     .recipe-container {
-      max-width: 900px;
-      background: white;
-      margin: 0 auto 40px auto;
-      padding: 2rem;
-      border-radius: 20px;
+      max-width: 900px; background: white; margin: 0 auto 40px auto;
+      padding: 2rem; border-radius: 20px;
       box-shadow: 0 8px 22px rgba(25, 135, 84, 0.15);
     }
-
     .recipe-img {
-      width: 100%;
-      height: 330px;
-      object-fit: cover;
-      border-radius: 18px;
-      border: 3px solid #27c284;
-      box-shadow: 0 4px 15px rgba(25, 135, 84, 0.1);
-      margin-bottom: 20px;
+      width: 100%; height: 330px; object-fit: cover;
+      border-radius: 18px; border: 3px solid #27c284; margin-bottom: 20px;
     }
-
-    .recipe-title {
-      text-align: center;
-      font-size: 2rem;
-      font-weight: 800;
-      color: #198754;
-    }
-
-    .recipe-category {
-      text-align: center;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #27c284;
-      margin-bottom: 1.5rem;
-    }
-
     .section-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #198754;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      border-left: 4px solid #27c284;
-      padding-left: 10px;
+      font-size: 1.3rem; font-weight: 700; color: #198754;
+      margin-top: 20px; margin-bottom: 10px;
+      border-left: 4px solid #27c284; padding-left: 10px;
     }
-
-    /* TEXT BOXES */
     .info-box {
-      background: #f9fdfb;
-      padding: 1rem;
-      border-radius: 12px;
-      border: 1px solid #d9f0e3;
-      height: 230px;
-      overflow-y: auto;
-      line-height: 1.7;
-      white-space: pre-wrap;   /* ✅ Keeps original text formatting */
-    }
-
-    .info-box::-webkit-scrollbar {
-      width: 7px;
-    }
-
-    .info-box::-webkit-scrollbar-thumb {
-      background: #27c284;
-      border-radius: 10px;
-    }
-
-    .btn-back {
-      margin-top: 25px;
-      border-radius: 12px;
-      border: 2px solid #198754;
-      color: #198754;
-      padding: 8px 18px;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .btn-back:hover {
-      background: #198754;
-      color: white;
+      background: #f9fdfb; padding: 1rem; border-radius: 12px;
+      border: 1px solid #d9f0e3; overflow-y: auto; white-space: pre-wrap;
     }
   </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
+<!-- ✅ NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand fw-bold text-white" href="#">
@@ -126,37 +55,179 @@
   </div>
 </nav>
 
-<!-- EXTRA GAP BELOW NAVBAR -->
 <div class="top-space"></div>
 
-<!-- MAIN RECIPE BOX -->
 <div class="recipe-container">
 
-  <img src="{{ recipe[5] }}" class="recipe-img" alt="Recipe Image">
+  {% if recipe['image_url'] %}
+  <img src="{{ recipe['image_url'] }}" class="recipe-img" alt="{{ recipe['title'] }}">
+  {% else %}
+  <p class="text-muted text-center">No image available</p>
+  {% endif %}
+  
 
-  <h2 class="recipe-title">{{ recipe[1] }}</h2>
+  <h2 class="text-center fw-bold text-success">{{ recipe['title'] }}</h2>
 
-  {% if recipe[4] %}
-  <p class="recipe-category">📂 Category: {{ recipe[4] }}</p>
+  <!-- ✅ Display Recipe Creator -->
+  <p class="text-center text-muted mb-1">
+    👨‍🍳 Added by <strong>{{ recipe['creator_username'] }}</strong>
+  </p>
+
+  <!-- ✅ Category -->
+  {% if recipe['category'] %}
+  <p class="text-center fw-semibold text-success mb-3">📂 Category: {{ recipe['category'] }}</p>
   {% endif %}
 
-  <!-- INGREDIENTS -->
+  <!-- ✅ Average Rating -->
+  {% if avg_rating %}
+  <p class="text-center mt-2 mb-1">
+    ⭐ <strong>{{ avg_rating }}/5</strong> ({{ total_reviews }} Reviews)
+  </p>
+  {% else %}
+  <p class="text-center text-muted">No ratings yet</p>
+  {% endif %}
+
+  <!-- ✅ Buttons -->
+  <div class="text-center mb-3">
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reviewModal">
+      ⭐ Add Rating & Review
+    </button>
+  </div>
+
+  <div class="text-center mb-4">
+    <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#reviewsModal">
+      📝 View All Reviews
+    </button>
+  </div>
+
+  <!-- ✅ Ingredients -->
   <h4 class="section-title">🥦 Ingredients</h4>
   <div class="info-box">
-    {{ recipe[2] }}
+    {{ recipe['ingredients'] }}
   </div>
 
-  <!-- INSTRUCTIONS -->
+  <!-- ✅ Instructions -->
   <h4 class="section-title">🍳 Instructions</h4>
   <div class="info-box">
-    {{ recipe[3] }}
+    {{ recipe['instructions'] }}
   </div>
 
+  <!-- ✅ ✅ NEW — Recipe Video Section -->
+  {% if recipe['video_url'] %}
+  <h4 class="section-title">🎬 Recipe Video</h4>
+
+  {% if 'youtu.be' in recipe['video_url'] %}
+    {% set video_id = recipe['video_url'].split('/')[-1] %}
+  {% elif 'watch?v=' in recipe['video_url'] %}
+    {% set video_id = recipe['video_url'].split('v=')[-1].split('&')[0] %}
+  {% endif %}
+
+  <!-- Embedded YouTube Player -->
+  <div class="ratio ratio-16x9 mb-3">
+    <iframe
+      src="https://www.youtube.com/embed/{{ video_id }}"
+      allowfullscreen
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+    </iframe>
+  </div>
+
+  <!-- Optional — Direct Link Button -->
+  <div class="text-center mb-4">
+    <a href="{{ recipe['video_url'] }}" target="_blank" class="btn btn-danger btn-lg">
+      ▶ Watch on YouTube
+    </a>
+  </div>
+  {% endif %}
+
   <div class="text-center mt-4">
-    <a href="{{ url_for('view_recipes') }}" class="btn-back">⬅ Back to My Recipes</a>
+    <a href="{{ url_for('view_recipes') }}" class="btn btn-outline-success">⬅ Back to My Recipes</a>
   </div>
 
 </div>
+
+<!-- ✅ Review Modal (Add Review) -->
+<div class="modal fade" id="reviewModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ url_for('add_review', recipe_id=recipe['id']) }}" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Rate & Review Recipe</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} text-center py-2">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <label class="form-label">Rating (1–5)</label>
+        <select name="rating" class="form-select" required>
+          <option value="">Select Rating</option>
+          <option value="5">⭐⭐⭐⭐⭐</option>
+          <option value="4">⭐⭐⭐⭐</option>
+          <option value="3">⭐⭐⭐</option>
+          <option value="2">⭐⭐</option>
+          <option value="1">⭐</option>
+        </select>
+
+        <label class="form-label mt-3">Your Review</label>
+        <textarea name="comment" class="form-control" rows="4" required></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-success" type="submit">Submit</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ✅ Reviews Popup Modal -->
+<div class="modal fade" id="reviewsModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">All Reviews</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        {% if reviews %}
+          {% for r in reviews %}
+          <div class="border rounded p-3 mb-3">
+            <strong>{{ r['username'] }}</strong> — ⭐ {{ r['rating'] }}/5
+            <br>
+            <small class="text-muted">{{ r['created_at'] }}</small>
+            <p class="mt-2">{{ r['comment'] }}</p>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted text-center">No reviews yet. Be the first!</p>
+        {% endif %}
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <script>
+    new bootstrap.Modal(document.getElementById("reviewModal")).show();
+  </script>
+  {% endif %}
+{% endwith %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

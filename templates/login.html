@@ -77,6 +77,7 @@
     <!-- IMPORTANT: Pass role to backend -->
     <input type="hidden" name="role" value="{{ role }}">
 
+
     <div class="form-floating-custom">
       <input type="email" name="email" placeholder=" " required />
       <label>Email</label>
@@ -93,7 +94,7 @@
   {% if role != 'admin' %}
   <p class="mt-3">
     Don’t have an account?
-    <a href="/register">Register</a>
+    <a href="/signup">Register</a>
   </p>
 
   <p class="mt-1">

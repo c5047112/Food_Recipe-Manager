@@ -19,7 +19,7 @@
 
 <div class="container mt-5">
 
-    <!-- USER APPROVALS -->
+    <!-- ✅ USER APPROVALS -->
     <h3>Pending User Approvals</h3>
 
     {% if pending_users %}
@@ -54,15 +54,64 @@
         </tbody>
     </table>
     {% else %}
-        <p>No pending users.</p>
+        <p>No pending users ✅</p>
     {% endif %}
 
     <hr>
 
-    <!-- DELETE REQUESTS -->
+    <!-- ✅ RECIPE APPROVAL REQUESTS -->
+    <h3>Pending Recipe Approvals</h3>
+
+    {% if pending_recipes %}
+    <table class="table table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Recipe ID</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Submitted By</th>
+                <th>Preview</th>
+                <th>Approve</th>
+                <th>Reject</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in pending_recipes %}
+            <tr>
+                <td>{{ r["id"] }}</td>
+                <td>{{ r["title"] }}</td>
+                <td>{{ r["category"] }}</td>
+                <td>{{ r["username"] }}</td>
+                <td>
+                    <a href="{{ url_for('view_recipe', recipe_id=r['id']) }}" class="btn btn-info btn-sm">
+                        View
+                    </a>                    
+                </td>
+                <td>
+                    <form action="{{ url_for('admin_approve_recipe', recipe_id=r['id']) }}" method="POST">
+                        <button class="btn btn-success btn-sm">Approve ✅</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="{{ url_for('admin_reject_recipe', recipe_id=r['id']) }}" method="POST">
+                        <button class="btn btn-danger btn-sm">Reject ❌</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+        <p>No pending recipes ✅</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- ❌ OPTIONAL — ONLY IF YOU SUPPORT DELETE REQUESTS -->
+    {% if pending_deletes %}
     <h3>Pending Recipe Delete Requests</h3>
 
-    {% if pending_deletes %}
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -91,9 +140,6 @@
             {% endfor %}
         </tbody>
     </table>
-
-    {% else %}
-        <p>No delete requests.</p>
     {% endif %}
 
 </div>

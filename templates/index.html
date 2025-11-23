@@ -1,292 +1,495 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Food & Recipe Manager | Home</title>
 
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food & Recipe Manager | Home</title>
 
-    <!-- Icons -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- Custom Styles -->
-    <style>
-      body {
-        scroll-behavior: smooth;
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      scroll-behavior: smooth;
+      background: #f2f7f2;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(90deg, #198754, #27c284) !important;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #fff !important;
+    }
+
+    .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #ffc107 !important;
+      transform: scale(1.1);
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        url('https://images.unsplash.com/photo-1504674900247-0877df9cc836') center/cover no-repeat;
+      color: #fff;
+      text-align: center;
+      padding: 180px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero h1 {
+      font-size: 3.8rem;
+      font-weight: 700;
+      animation: fadeInDown 1s ease-out;
+      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero p {
+      font-size: 1.4rem;
+      margin: 25px 0 35px;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .btn-main {
+      background: #ffc107;
+      color: #000;
+      font-weight: 600;
+      border-radius: 50px;
+      padding: 14px 40px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-main:hover {
+      background: #ffca2c;
+      transform: scale(1.1);
+    }
+
+    .btn-outline-light {
+      border-radius: 50px;
+      padding: 14px 40px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-light:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffc107;
+    }
+
+    /* Section Headings */
+    h2.section-title {
+      font-weight: 700;
+      margin-bottom: 50px;
+      color: #198754;
+      position: relative;
+    }
+
+    h2.section-title::after {
+      content: '';
+      width: 60px;
+      height: 4px;
+      background: #ffc107;
+      display: block;
+      margin: 15px auto 0;
+      border-radius: 2px;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #ffffff, #d4f7dc);
+      padding: 30px 20px;
+      transition: all 0.4s ease;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      transform: translateY(0);
+      opacity: 0;
+      animation: fadeInUpCard 0.8s forwards;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-15px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .feature-card i {
+      color: #198754;
+      margin-bottom: 15px;
+      font-size: 2rem;
+    }
+
+    /* Gallery */
+    .gallery img {
+      border-radius: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.08);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Stats Section */
+    .stats {
+      background: linear-gradient(135deg, #27c284, #198754);
+      color: #fff;
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .stats h2 {
+      font-weight: 700;
+      margin-bottom: 50px;
+    }
+
+    .stat-item {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      transition: transform 0.3s;
+    }
+
+    .stat-item:hover {
+      transform: scale(1.2);
+      color: #ffc107;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    /* User Stories */
+    .user-story-card {
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(145deg, #ffffff, #e1f7de);
+      padding: 30px 20px;
+      transition: all 0.4s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transform: translateY(0);
+      opacity: 0;
+      animation: fadeInUpCard 0.8s forwards;
+    }
+
+    .user-story-card:hover {
+      transform: translateY(-15px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .user-story-card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 3px solid #198754;
+    }
+
+    .user-story-card h5 {
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .user-story-card p.role {
+      font-weight: 600;
+      color: #27c284;
+      margin-bottom: 10px;
+    }
+
+    .user-story-card p.story {
+      font-style: italic;
+      color: #555;
+    }
+
+    /* Featured Recipes */
+    .recipe-card {
+      border-radius: 25px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      opacity: 0;
+      animation: fadeInUpCard 0.8s forwards;
+    }
+
+    .recipe-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .recipe-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .recipe-card .card-body {
+      background: #fff;
+      padding: 20px;
+    }
+
+    .recipe-card .card-body h5 {
+      font-weight: 700;
+      color: #198754;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
       }
 
-      /* 🌟 Navbar */
-      .navbar {
-        background-color: #198754 !important; /* Bootstrap success */
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
-      .navbar-brand {
-        font-weight: 700;
-        color: #fff !important;
-      }
-      .nav-link {
-        color: #fff !important;
-        font-weight: 500;
-      }
-      .nav-link:hover {
-        color: #ffc107 !important;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
       }
 
-      /* 🍳 Hero Section */
-      .hero {
-        background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
-          url('https://images.unsplash.com/photo-1504674900247-0877df9cc836')
-            center/cover no-repeat;
-        color: white;
-        text-align: center;
-        padding: 130px 20px;
-        animation: fadeIn 1.5s ease-in-out;
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
+    }
 
-      .hero h1 {
-        font-size: 2.8rem;
-        font-weight: 700;
-        animation: slideInDown 1s ease-out;
+    @keyframes fadeInUpCard {
+      0% {
+        opacity: 0;
+        transform: translateY(40px);
       }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-      .hero p {
-        font-size: 1.2rem;
-        margin: 15px 0 30px;
-        animation: fadeInUp 1.2s ease-out;
-      }
+    /* CTA Section */
+    .cta {
+      background: linear-gradient(135deg, #27c284, #198754);
+      color: #fff;
+      padding: 80px 0;
+      text-align: center;
+    }
 
-      .btn-main {
-        background-color: #ffc107;
-        color: #000;
-        border: none;
-        font-weight: 600;
-        transition: transform 0.3s;
-      }
-      .btn-main:hover {
-        background-color: #ffca2c;
-        transform: scale(1.05);
-      }
+    .cta h2 {
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
 
-      /* 🍲 About Section */
-      .about {
-        padding: 80px 0;
-      }
+    .cta p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
 
-      /* ✨ Features */
-      .feature-card {
-        border: none;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      .feature-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      }
+    /* Footer */
+    footer {
+      background: #145c38;
+      color: #fff;
+      text-align: center;
+      padding: 25px 0;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
 
-      /* 💬 Testimonials */
-      .carousel-item {
-        text-align: center;
-        padding: 50px 0;
-      }
-      .carousel-item p {
-        font-style: italic;
-      }
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="#">🍴 Recipe Manager</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="/signup">Register</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-      /* 📢 CTA */
-      .cta {
-        background-color: #198754;
-        color: white;
-        padding: 60px 0;
-      }
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>Welcome to Your Personal Food & Recipe Manager 🍳</h1>
+      <p>Organize, cook, and share your favorite recipes — anytime, anywhere.</p>
+      <a href="/login" class="btn btn-main me-3 px-4">Login</a>
+      <a href="/register" class="btn btn-outline-light px-4">Register</a>
+    </div>
+  </section>
 
-      /* 🦶 Footer */
-      footer {
-        background: #145c38;
-        color: white;
-        text-align: center;
-        padding: 20px 0;
-      }
-
-      /* 🎞️ Animations */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-      @keyframes fadeInUp {
-        from {
-          transform: translateY(20px);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
-      }
-      @keyframes slideInDown {
-        from {
-          transform: translateY(-40px);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- 🌟 Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
-      <div class="container">
-        <a class="navbar-brand" href="#">🍴 Recipe Manager</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div
-          class="collapse navbar-collapse justify-content-end"
-          id="navbarNav"
-        >
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link active" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/login">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/register">Register</a>
-            </li>
-          </ul>
+  <!-- Features Section -->
+  <section class="py-5 container">
+    <h2 class="section-title text-center">✨ Key Features</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="bi bi-plus-circle-fill"></i>
+          <h5 class="mt-3">Add Recipes</h5>
+          <p>Store recipes with ingredients, steps, and images — neatly and securely.</p>
         </div>
       </div>
-    </nav>
-
-    <!-- 🍳 Hero Section -->
-    <section class="hero">
-      <div class="container">
-        <h1>Welcome to Your Personal Food & Recipe Manager 🍳</h1>
-        <p>
-          Organize, cook, and share your favorite recipes — anytime, anywhere.
-        </p>
-        <a href="/login" class="btn btn-main me-3 px-4 py-2">Login</a>
-        <a href="/register" class="btn btn-outline-light px-4 py-2"
-          >Register</a
-        >
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="bi bi-people-fill"></i>
+          <h5 class="mt-3">Admin & User Roles</h5>
+          <p>Enjoy secure access with separate user and admin functionalities.</p>
+        </div>
       </div>
-    </section>
-
-    <!-- 🍲 About Section -->
-    <section class="about text-center bg-light">
-      <div class="container">
-        <h2 class="text-success fw-bold mb-3">About Our Platform</h2>
-        <p class="text-muted">
-          Food & Recipe Manager helps you store and manage all your culinary
-          creations. Whether you’re a professional chef or a home cook, this app
-          makes your kitchen experience more delightful.
-        </p>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="bi bi-journal-text"></i>
+          <h5 class="mt-3">Manage Recipes</h5>
+          <p>Easily edit, view, and delete your recipes anytime — all in one place.</p>
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ✨ Features -->
-    <section class="py-5">
-      <div class="container text-center">
-        <h2 class="fw-bold text-success mb-4">✨ Key Features</h2>
-        <div class="row">
-          <div class="col-md-4 mb-4">
-            <div class="card feature-card p-4">
-              <i class="bi bi-plus-circle-fill text-success fs-1 mb-3"></i>
-              <h5>Add Recipes</h5>
-              <p>
-                Store recipes with ingredients, steps, and images — neatly and
-                securely.
-              </p>
-            </div>
+  <!-- Gallery Section -->
+  <section class="py-5 gallery container">
+    <h2 class="section-title text-center">📸 Recipe Gallery</h2>
+    <div class="row g-4">
+      <div class="col-md-4"><img src="https://images.unsplash.com/photo-1601050691317-69fa2b34a59d" alt="Recipe 1"></div>
+      <div class="col-md-4"><img src="https://images.unsplash.com/photo-1604908177222-2b74494b7fd9" alt="Recipe 2"></div>
+      <div class="col-md-4"><img src="https://images.unsplash.com/photo-1603070444363-4973a2769c1e" alt="Recipe 3"></div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats">
+    <div class="container">
+      <h2>Our Achievements</h2>
+      <div class="row text-center mt-5">
+        <div class="col-md-3">
+          <div class="stat-item">10k+</div>
+          <div class="stat-label">Recipes Stored</div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-item">5k+</div>
+          <div class="stat-label">Happy Users</div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-item">200+</div>
+          <div class="stat-label">Chefs & Admins</div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-item">50+</div>
+          <div class="stat-label">Features Added</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- User Stories Section -->
+  <section class="py-5 bg-light">
+    <div class="container text-center">
+      <h2 class="section-title">🗣️ User Stories</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="user-story-card">
+            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Priya">
+            <h5>Priya Sharma</h5>
+            <p class="role">Home Chef</p>
+            <p class="story">"This app has made managing my recipes so easy! I love sharing them with friends and family."</p>
           </div>
-
-          <div class="col-md-4 mb-4">
-            <div class="card feature-card p-4">
-              <i class="bi bi-people-fill text-success fs-1 mb-3"></i>
-              <h5>Admin & User Roles</h5>
-              <p>
-                Enjoy secure access with separate user and admin functionalities.
-              </p>
-            </div>
+        </div>
+        <div class="col-md-4">
+          <div class="user-story-card">
+            <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Rahul">
+            <h5>Rahul Verma</h5>
+            <p class="role">Food Blogger</p>
+            <p class="story">"Clean design and easy-to-use interface. Highly recommended for all food enthusiasts!"</p>
           </div>
-
-          <div class="col-md-4 mb-4">
-            <div class="card feature-card p-4">
-              <i class="bi bi-journal-text text-success fs-1 mb-3"></i>
-              <h5>Manage Recipes</h5>
-              <p>
-                Easily edit, view, and delete your recipes anytime — all in one
-                place.
-              </p>
-            </div>
+        </div>
+        <div class="col-md-4">
+          <div class="user-story-card">
+            <img src="https://randomuser.me/api/portraits/women/22.jpg" alt="Sneha">
+            <h5>Sneha Kapoor</h5>
+            <p class="role">Restaurant Owner</p>
+            <p class="story">"The admin tools are fantastic! Managing recipes has never been this smooth."</p>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 💬 Testimonials -->
-    <section class="bg-light py-5">
-      <div class="container text-center">
-        <h2 class="text-success fw-bold mb-4">💬 What Our Users Say</h2>
-        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            <div class="carousel-item active">
-              <p>"This app made my cooking life so easy — I love organizing recipes here!"</p>
-              <h6 class="fw-bold text-success">— Priya, Home Chef</h6>
-            </div>
-            <div class="carousel-item">
-              <p>"Clean design and simple navigation. Highly recommended for foodies!"</p>
-              <h6 class="fw-bold text-success">— Rahul, Food Blogger</h6>
-            </div>
-            <div class="carousel-item">
-              <p>"The admin tools make managing recipes so smooth. Fantastic app!"</p>
-              <h6 class="fw-bold text-success">— Sneha, Restaurant Owner</h6>
-            </div>
+  <!-- Featured Recipes Section -->
+  <section class="py-5 container">
+    <h2 class="section-title text-center">🍽️ Featured Recipes</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="recipe-card">
+          <img src="https://images.unsplash.com/photo-1601050691317-69fa2b34a59d" alt="Recipe 1">
+          <div class="card-body">
+            <h5>Spaghetti Carbonara</h5>
+            <p>Classic Italian pasta with creamy sauce and bacon.</p>
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- 📢 CTA Section -->
-    <section class="cta text-center">
-      <div class="container">
-        <h2 class="fw-bold mb-3">Start Your Culinary Journey Today! 🥘</h2>
-        <p class="mb-4">
-          Join thousands of users organizing their favorite recipes online.
-        </p>
-        <a href="/register" class="btn btn-warning px-4 py-2 me-3 fw-semibold">Register Now</a>
-        <a href="/login" class="btn btn-outline-light px-4 py-2">Login</a>
+      <div class="col-md-4">
+        <div class="recipe-card">
+          <img src="https://images.unsplash.com/photo-1604908177222-2b74494b7fd9" alt="Recipe 2">
+          <div class="card-body">
+            <h5>Grilled Chicken Salad</h5>
+            <p>Fresh vegetables topped with juicy grilled chicken.</p>
+          </div>
+        </div>
       </div>
-    </section>
+      <div class="col-md-4">
+        <div class="recipe-card">
+          <img src="https://images.unsplash.com/photo-1603070444363-4973a2769c1e" alt="Recipe 3">
+          <div class="card-body">
+            <h5>Chocolate Brownie</h5>
+            <p>Rich and fudgy brownie perfect for dessert lovers.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <!-- 🦶 Footer -->
-    <footer>
-      <p class="mb-0">
-        © 2025 Food & Recipe Manager | Developed by
-        <b>Prithvi Roshan</b> 💚
-      </p>
-    </footer>
+  <!-- CTA Section -->
+  <section class="cta">
+    <div class="container">
+      <h2>Start Your Culinary Journey Today! 🥘</h2>
+      <p>Join thousands of users organizing their favorite recipes online.</p>
+      <a href="/register" class="btn btn-warning px-4 py-2 me-3 fw-semibold">Register Now</a>
+      <a href="/login" class="btn btn-outline-light px-4 py-2">Login</a>
+    </div>
+  </section>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+  <!-- Footer -->
+  <footer>
+    <p class="mb-0">© 2025 Food & Recipe Manager | Developed by <b>Prithvi Roshan</b> 💚</p>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
 </html>

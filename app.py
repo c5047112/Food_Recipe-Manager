@@ -5,7 +5,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
-
 # ---------------------------------------------
 # DATABASE CONNECTION
 # ---------------------------------------------
@@ -14,6 +13,69 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+# ---------------------------------------------
+# INITIALIZE DATABASE AND DEFAULT ADMIN
+# ---------------------------------------------
+conn = sqlite3.connect("recipe.db")
+c = conn.cursor()
+
+# USERS TABLE
+c.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    is_approved INTEGER DEFAULT 0,
+    is_admin INTEGER DEFAULT 0
+);
+""")
+
+# RECIPES TABLE
+c.execute("""
+CREATE TABLE IF NOT EXISTS recipes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    ingredients TEXT NOT NULL,
+    instructions TEXT NOT NULL,
+    category TEXT,
+    image_url TEXT,
+    video_url TEXT,
+    user_id INTEGER,
+    delete_request INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'pending',
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+""")
+
+
+# REVIEWS TABLE
+c.execute("""
+CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    recipe_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    rating INTEGER NOT NULL,
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(recipe_id) REFERENCES recipes(id),
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+""")
+
+
+# Add default admin if it doesn't exist
+c.execute("SELECT * FROM users WHERE is_admin = 1")
+admin = c.fetchone()
+if not admin:
+    c.execute("""
+        INSERT INTO users (username, email, password, is_approved, is_admin)
+        VALUES (?, ?, ?, 1, 1)
+    """, ("admin", "admin@example.com", generate_password_hash("admin123")))
+
+conn.commit()
+conn.close()
+print("Database initialized successfully!")
 
 # ---------------------------------------------
 # HOME
@@ -21,7 +83,6 @@ def get_db_connection():
 @app.route("/")
 def home():
     return render_template("index.html")
-
 
 # ---------------------------------------------
 # USER SIGNUP
@@ -47,14 +108,15 @@ def signup():
         flash("Signup successful! Wait for admin approval.", "success")
         return redirect(url_for("login"))
 
-    return render_template("signup.html")
-
+    return render_template("register.html")
 
 # ---------------------------------------------
 # LOGIN
 # ---------------------------------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    role = request.args.get("role", "user")  # Default role = user
+
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -66,7 +128,6 @@ def login():
         conn.close()
 
         if user and check_password_hash(user["password"], password):
-
             session["user_id"] = user["id"]
             session["username"] = user["username"]
             session["is_admin"] = user["is_admin"]
@@ -82,8 +143,7 @@ def login():
 
         flash("Invalid email or password!", "danger")
 
-    return render_template("login.html")
-
+    return render_template("login.html", role=role)
 
 # ---------------------------------------------
 # LOGOUT
@@ -92,7 +152,6 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("login"))
-
 
 # ---------------------------------------------
 # USER DASHBOARD
@@ -103,9 +162,8 @@ def user_dashboard():
         return redirect(url_for("login"))
     return render_template("user_dashboard.html", username=session["username"])
 
-
 # ---------------------------------------------
-# ADD RECIPE (WITH VIDEO URL SUPPORT)
+# ADD RECIPE
 # ---------------------------------------------
 @app.route("/add_recipe", methods=["GET", "POST"])
 def add_recipe():
@@ -118,30 +176,32 @@ def add_recipe():
         instructions = request.form["instructions"]
         category = request.form["category"]
         image_url = request.form["image_url"]
-        video_url = request.form["video_url"]  # NEW FIELD
+        video_url = request.form["video_url"]
 
         conn = get_db_connection()
         c = conn.cursor()
 
         c.execute("""
-            INSERT INTO recipes 
-            (title, ingredients, instructions, category, image_url, video_url, user_id, delete_request)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 0)
-        """, (title, ingredients, instructions, category,
-              image_url, video_url, session["user_id"]))
+    INSERT INTO recipes 
+    (title, ingredients, instructions, category, image_url, video_url, user_id, delete_request, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 0, 'pending')
+    """, (title, ingredients, instructions, category,
+      image_url, video_url, session["user_id"]))
+
 
         conn.commit()
         conn.close()
 
-        flash("Recipe added successfully!", "success")
+        flash("✅ Recipe submitted! Waiting for admin approval.", "info")
         return redirect(url_for("view_recipes"))
 
     return render_template("add_recipe.html", username=session["username"])
 
-
 # ---------------------------------------------
-# VIEW USER RECIPES
+# ✅ UPDATED — VIEW ALL RECIPES FOR ALL USERS
 # ---------------------------------------------
+# ---------------------------------------------------
+# ✅ VIEW ALL RECIPES PAGE
 @app.route("/view_recipes")
 def view_recipes():
     if "user_id" not in session:
@@ -150,42 +210,126 @@ def view_recipes():
     conn = get_db_connection()
     c = conn.cursor()
 
-    c.execute("SELECT * FROM recipes WHERE user_id = ?", (session["user_id"],))
+    c.execute("""
+    SELECT recipes.*, users.username
+    FROM recipes
+    JOIN users ON recipes.user_id = users.id
+    WHERE recipes.status = 'approved'
+    """)
+
     recipes = c.fetchall()
 
     conn.close()
 
-    return render_template("view_recipes.html",
-                           recipes=recipes,
-                           username=session["username"])
+    return render_template(
+        "view_recipes.html",
+        recipes=recipes,
+        username=session.get("username")
+    )
 
 
-# ---------------------------------------------
-# VIEW SINGLE RECIPE
-# ---------------------------------------------
+# ---------------------------------------------------
+# ✅ VIEW SINGLE RECIPE WITH CREATOR + REVIEWS
 @app.route("/recipe/<int:recipe_id>")
 def view_recipe(recipe_id):
     conn = get_db_connection()
     c = conn.cursor()
 
-    c.execute("SELECT * FROM recipes WHERE id = ?", (recipe_id,))
+    # ✅ Fetch recipe + creator username
+    c.execute("""
+        SELECT recipes.*, users.username
+        FROM recipes
+        LEFT JOIN users ON recipes.user_id = users.id
+        WHERE recipes.id = ?
+    """, (recipe_id,))
     recipe = c.fetchone()
+
+    # ✅ Fetch reviews + reviewer username
+    c.execute("""
+        SELECT reviews.*, users.username
+        FROM reviews
+        JOIN users ON reviews.user_id = users.id
+        WHERE recipe_id = ?
+        ORDER BY created_at DESC
+    """, (recipe_id,))
+    reviews = c.fetchall()
+
+    # ✅ Fetch average rating + total review count
+    c.execute("""
+        SELECT 
+            ROUND(AVG(rating), 1) AS avg_rating,
+            COUNT(*) AS total_reviews
+        FROM reviews
+        WHERE recipe_id = ?
+    """, (recipe_id,))
+    rating_data = c.fetchone()
+
+    avg_rating = rating_data["avg_rating"] or 0
+    total_reviews = rating_data["total_reviews"]
 
     conn.close()
 
-    return render_template("view_RecipeInfo.html",
-                           recipe=recipe,
-                           username=session.get("username"))
+    return render_template(
+    "view_RecipeInfo.html",
+    recipe=recipe,
+    username=session["username"],
+    reviews=reviews,
+    avg_rating=avg_rating,
+    total_reviews=total_reviews
+    )
+
+
+
+@app.route("/recipe/<int:recipe_id>/add_review", methods=["POST"])
+def add_review(recipe_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    rating = request.form["rating"]
+    comment = request.form.get("comment", "")
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("""
+        INSERT INTO reviews (recipe_id, user_id, rating, comment)
+        VALUES (?, ?, ?, ?)
+    """, (recipe_id, session["user_id"], rating, comment))
+
+    conn.commit()
+    conn.close()
+
+    flash("✅ Review added successfully!", "success")
+    return redirect(url_for("view_recipe", recipe_id=recipe_id))
+
+
+@app.route("/recipe/<int:recipe_id>/reviews")
+def get_reviews(recipe_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT reviews.*, users.username
+        FROM reviews
+        JOIN users ON reviews.user_id = users.id
+        WHERE recipe_id = ?
+        ORDER BY created_at DESC
+    """, (recipe_id,))
+
+    reviews = c.fetchall()
+    conn.close()
+
+    return reviews
+
 
 
 # ---------------------------------------------
-# EDIT RECIPE (WITH VIDEO URL SUPPORT)
+# EDIT RECIPE
 # ---------------------------------------------
 @app.route("/edit_recipe/<int:recipe_id>", methods=["GET", "POST"])
 def edit_recipe(recipe_id):
     conn = get_db_connection()
     c = conn.cursor()
-
     c.execute("SELECT * FROM recipes WHERE id = ?", (recipe_id,))
     recipe = c.fetchone()
 
@@ -195,7 +339,7 @@ def edit_recipe(recipe_id):
         instructions = request.form["instructions"]
         category = request.form["category"]
         image_url = request.form["image_url"]
-        video_url = request.form["video_url"]  # NEW
+        video_url = request.form["video_url"]
 
         c.execute("""
             UPDATE recipes 
@@ -212,10 +356,9 @@ def edit_recipe(recipe_id):
     conn.close()
     return render_template("edit_recipe.html", recipe=recipe)
 
-
-# ==========================================================
-# USER DELETE REQUEST (NOT REAL DELETE)
-# ==========================================================
+# ---------------------------------------------
+# USER DELETE REQUEST
+# ---------------------------------------------
 @app.route("/delete_recipe/<int:recipe_id>", methods=["POST"])
 def delete_recipe(recipe_id):
     if "user_id" not in session:
@@ -223,7 +366,6 @@ def delete_recipe(recipe_id):
 
     conn = get_db_connection()
     c = conn.cursor()
-
     c.execute("""
         UPDATE recipes SET delete_request = 1
         WHERE id = ? AND user_id = ?
@@ -231,14 +373,12 @@ def delete_recipe(recipe_id):
 
     conn.commit()
     conn.close()
-
     flash("Delete request sent to admin!", "warning")
     return redirect(url_for("view_recipes"))
 
-
-# ==========================================================
+# ---------------------------------------------
 # ADMIN DASHBOARD
-# ==========================================================
+# ---------------------------------------------
 @app.route("/admin_dashboard")
 def admin_dashboard():
     if "is_admin" not in session or session["is_admin"] != 1:
@@ -246,7 +386,6 @@ def admin_dashboard():
 
     conn = get_db_connection()
     c = conn.cursor()
-
     c.execute("""
         SELECT users.id, users.username, users.email,
                COUNT(recipes.id) AS recipe_count
@@ -256,17 +395,12 @@ def admin_dashboard():
         GROUP BY users.id
     """)
     users = c.fetchall()
-
     conn.close()
 
     return render_template("admin_dashboard.html",
                            users=users,
                            username=session["username"])
 
-
-# ==========================================================
-# ADMIN REQUESTS PAGE 
-# ==========================================================
 @app.route("/admin_requests")
 def admin_requests():
     if "is_admin" not in session or session["is_admin"] != 1:
@@ -275,33 +409,46 @@ def admin_requests():
     conn = get_db_connection()
     c = conn.cursor()
 
+    # Pending user approvals
     c.execute("SELECT * FROM users WHERE is_approved = 0 AND is_admin = 0")
     pending_users = c.fetchall()
 
+    # Pending delete requests
     c.execute("""
         SELECT recipes.*, users.username
         FROM recipes
         JOIN users ON recipes.user_id = users.id
-        WHERE delete_request = 1
+        WHERE recipes.delete_request = 1
     """)
     pending_deletes = c.fetchall()
 
+    # Pending recipe approval requests
+    c.execute("""
+        SELECT recipes.*, users.username
+        FROM recipes
+        JOIN users ON recipes.user_id = users.id
+        WHERE recipes.status = 'pending'
+    """)
+    pending_recipes = c.fetchall()
+
     conn.close()
 
-    return render_template("admin_requests.html",
-                           pending_users=pending_users,
-                           pending_deletes=pending_deletes,
-                           username=session["username"])
+    return render_template(
+        "admin_requests.html",
+        pending_users=pending_users,
+        pending_deletes=pending_deletes,
+        pending_recipes=pending_recipes,
+        username=session["username"]
+    )
 
 
-# ==========================================================
-# ADMIN: APPROVE / REJECT USER
-# ==========================================================
+# ---------------------------------------------
+# ADMIN APPROVE / REJECT USER
+# ---------------------------------------------
 @app.route("/admin/approve_user/<int:user_id>", methods=["POST"])
 def admin_approve_user(user_id):
     conn = get_db_connection()
     c = conn.cursor()
-
     c.execute("UPDATE users SET is_approved = 1 WHERE id = ?", (user_id,))
     conn.commit()
     conn.close()
@@ -309,12 +456,10 @@ def admin_approve_user(user_id):
     flash("User approved!", "success")
     return redirect(url_for("admin_requests"))
 
-
 @app.route("/admin/reject_user/<int:user_id>", methods=["POST"])
 def admin_reject_user(user_id):
     conn = get_db_connection()
     c = conn.cursor()
-
     c.execute("DELETE FROM users WHERE id = ?", (user_id,))
     conn.commit()
     conn.close()
@@ -322,15 +467,13 @@ def admin_reject_user(user_id):
     flash("User rejected!", "danger")
     return redirect(url_for("admin_requests"))
 
-
-# ==========================================================
-# ADMIN: DELETE RECIPE APPROVAL
-# ==========================================================
+# ---------------------------------------------
+# ADMIN APPROVE / REJECT DELETE
+# ---------------------------------------------
 @app.route("/admin/approve_delete/<int:recipe_id>", methods=["POST"])
 def admin_approve_delete(recipe_id):
     conn = get_db_connection()
     c = conn.cursor()
-
     c.execute("DELETE FROM recipes WHERE id = ?", (recipe_id,))
     conn.commit()
     conn.close()
@@ -338,12 +481,10 @@ def admin_approve_delete(recipe_id):
     flash("Recipe deleted!", "danger")
     return redirect(url_for("admin_requests"))
 
-
 @app.route("/admin/reject_delete/<int:recipe_id>", methods=["POST"])
 def admin_reject_delete(recipe_id):
     conn = get_db_connection()
     c = conn.cursor()
-
     c.execute("UPDATE recipes SET delete_request = 0 WHERE id = ?", (recipe_id,))
     conn.commit()
     conn.close()
@@ -351,10 +492,9 @@ def admin_reject_delete(recipe_id):
     flash("Delete request rejected!", "info")
     return redirect(url_for("admin_requests"))
 
-
-# ==========================================================
-# ADMIN: GET RECIPES OF A USER
-# ==========================================================
+# ---------------------------------------------
+# ADMIN GET USER RECIPES
+# ---------------------------------------------
 @app.route("/admin/get_user_recipes/<int:user_id>")
 def admin_get_user_recipes(user_id):
     if "is_admin" not in session or session["is_admin"] != 1:
@@ -362,7 +502,6 @@ def admin_get_user_recipes(user_id):
 
     conn = get_db_connection()
     c = conn.cursor()
-
     c.execute("""
         SELECT id, title, category
         FROM recipes
@@ -375,6 +514,84 @@ def admin_get_user_recipes(user_id):
         {"id": r["id"], "title": r["title"], "category": r["category"]}
         for r in recipes
     ]}
+
+@app.route("/admin/edit_user/<int:user_id>", methods=["GET", "POST"])
+def admin_edit_user(user_id):
+    if "is_admin" not in session or session["is_admin"] != 1:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    user = c.fetchone()
+
+    if request.method == "POST":
+        username = request.form["username"]
+        email = request.form["email"]
+
+        c.execute("""
+            UPDATE users SET username = ?, email = ?
+            WHERE id = ?
+        """, (username, email, user_id))
+
+        conn.commit()
+        conn.close()
+        flash("User details updated successfully!", "success")
+        return redirect(url_for("admin_dashboard"))
+
+    conn.close()
+    return render_template("admin_edit_user.html", user=user)
+
+@app.route("/admin/delete_user/<int:user_id>", methods=["POST"])
+def admin_delete_user(user_id):
+    if "is_admin" not in session or session["is_admin"] != 1:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+    flash("User deleted successfully!", "danger")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/delete_recipe/<int:recipe_id>", methods=["POST"])
+def admin_delete_recipe(recipe_id):
+    if "is_admin" not in session or session["is_admin"] != 1:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("DELETE FROM recipes WHERE id = ?", (recipe_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Recipe deleted successfully!", "danger")
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/approve_recipe/<int:recipe_id>", methods=["POST"])
+def admin_approve_recipe(recipe_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("UPDATE recipes SET status = 'approved' WHERE id = ?", (recipe_id,))
+    conn.commit()
+    conn.close()
+
+    flash("✅ Recipe approved successfully!", "success")
+    return redirect(url_for("admin_requests"))
+
+
+@app.route("/admin/reject_recipe/<int:recipe_id>", methods=["POST"])
+def admin_reject_recipe(recipe_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("DELETE FROM recipes WHERE id = ?", (recipe_id,))
+    conn.commit()
+    conn.close()
+
+    flash("❌ Recipe rejected & removed!", "danger")
+    return redirect(url_for("admin_requests"))
 
 
 # ---------------------------------------------
