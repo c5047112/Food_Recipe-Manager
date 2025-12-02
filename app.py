@@ -34,9 +34,53 @@ app.secret_key = "supersecretkey"
 # ---------------------------------------------
 # HOME
 # ---------------------------------------------
+import random
+
 @app.route("/")
 def home():
-    return render_template("index.html")
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    # Get all approved recipes
+    c.execute("SELECT * FROM recipes WHERE status='approved'")
+    all_recipes = c.fetchall()
+
+    # Pick random recipes for Featured (3) and Popular (6)
+    featured_recipes = random.sample(all_recipes, min(3, len(all_recipes)))
+    popular_recipes = random.sample(all_recipes, min(6, len(all_recipes)))
+
+    # Stats
+    c.execute("SELECT COUNT(*) AS total_recipes FROM recipes WHERE status='approved'")
+    total_recipes = c.fetchone()["total_recipes"]
+
+    c.execute("SELECT COUNT(*) AS total_users FROM users WHERE is_approved=1 AND is_admin=0")
+    total_users = c.fetchone()["total_users"]
+
+    c.execute("SELECT COUNT(*) AS total_chefs FROM users WHERE is_admin=1")
+    total_chefs = c.fetchone()["total_chefs"]
+
+    total_features = 50  # Hardcoded for demo
+
+    # Example user stories
+    user_stories = [
+        {"name": "Priya Sharma", "role": "Home Chef", "story": "This app has made managing my recipes so easy! I love sharing them with friends and family.", "img": "https://randomuser.me/api/portraits/women/68.jpg"},
+        {"name": "Rahul Verma", "role": "Food Blogger", "story": "Clean design and easy-to-use interface. Highly recommended for all food enthusiasts!", "img": "https://randomuser.me/api/portraits/men/45.jpg"},
+        {"name": "Sneha Kapoor", "role": "Restaurant Owner", "story": "The admin tools are fantastic! Managing recipes has never been this smooth.", "img": "https://randomuser.me/api/portraits/women/22.jpg"},
+    ]
+
+    conn.close()
+
+    return render_template(
+        "index.html",
+        featured_recipes=featured_recipes,
+        popular_recipes=popular_recipes,
+        total_recipes=total_recipes,
+        total_users=total_users,
+        total_chefs=total_chefs,
+        total_features=total_features,
+        user_stories=user_stories
+    )
+
 
 # ---------------------------------------------
 # USER SIGNUP

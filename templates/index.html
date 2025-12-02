@@ -131,25 +131,30 @@
       font-size: 2rem;
     }
 
-    /* Gallery */
-    .gallery img {
+    /* Carousel Images */
+    .carousel-img {
       border-radius: 20px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
       width: 100%;
-      height: 250px;
+      height: 400px;
       object-fit: cover;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .gallery img:hover {
-      transform: scale(1.08);
+    .carousel-img:hover {
+      transform: scale(1.03);
       box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      filter: invert(1);
     }
 
     /* Stats Section */
     .stats {
       background: linear-gradient(135deg, #27c284, #198754);
       color: #fff;
-      padding: 80px 0;
+      padding: 120px 0; /* Increased height */
       text-align: center;
     }
 
@@ -186,11 +191,6 @@
       transform: translateY(0);
       opacity: 0;
       animation: fadeInUpCard 0.8s forwards;
-    }
-
-    .user-story-card:hover {
-      transform: translateY(-15px) scale(1.05);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
     }
 
     .user-story-card img {
@@ -230,10 +230,12 @@
     }
 
     .recipe-card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
 
     .recipe-card:hover {
       transform: scale(1.05);
@@ -252,38 +254,18 @@
 
     /* Animations */
     @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes fadeInUpCard {
-      0% {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
     /* CTA Section */
@@ -344,134 +326,133 @@
   </section>
 
   <!-- Features Section -->
-  <section class="py-5 container">
-    <h2 class="section-title text-center">✨ Key Features</h2>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="feature-card">
-          <i class="bi bi-plus-circle-fill"></i>
-          <h5 class="mt-3">Add Recipes</h5>
-          <p>Store recipes with ingredients, steps, and images — neatly and securely.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="feature-card">
-          <i class="bi bi-people-fill"></i>
-          <h5 class="mt-3">Admin & User Roles</h5>
-          <p>Enjoy secure access with separate user and admin functionalities.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="feature-card">
-          <i class="bi bi-journal-text"></i>
-          <h5 class="mt-3">Manage Recipes</h5>
-          <p>Easily edit, view, and delete your recipes anytime — all in one place.</p>
-        </div>
+<section class="py-5 container">
+  <h2 class="section-title text-center">✨ Key Features</h2>
+  <div class="row g-4">
+    
+    <div class="col-md-4">
+      <div class="feature-card">
+        <i class="bi bi-plus-circle-fill"></i>
+        <h5 class="mt-3">Add Recipes</h5>
+        <p>Store recipes with ingredients, steps, and images — neatly and securely.</p>
       </div>
     </div>
-  </section>
 
-  <!-- Gallery Section -->
-  <section class="py-5 gallery container">
-    <h2 class="section-title text-center">📸 Recipe Gallery</h2>
-    <div class="row g-4">
-      <div class="col-md-4"><img src="https://images.unsplash.com/photo-1601050691317-69fa2b34a59d" alt="Recipe 1"></div>
-      <div class="col-md-4"><img src="https://images.unsplash.com/photo-1604908177222-2b74494b7fd9" alt="Recipe 2"></div>
-      <div class="col-md-4"><img src="https://images.unsplash.com/photo-1603070444363-4973a2769c1e" alt="Recipe 3"></div>
+    <div class="col-md-4">
+      <div class="feature-card">
+        <i class="bi bi-star-fill"></i>
+        <h5 class="mt-3">Ratings & Reviews</h5>
+        <p>See what others think about recipes and share your own feedback.</p>
+      </div>
     </div>
-  </section>
 
-  <!-- Stats Section -->
-  <section class="stats">
-    <div class="container">
-      <h2>Our Achievements</h2>
-      <div class="row text-center mt-5">
-        <div class="col-md-3">
-          <div class="stat-item">10k+</div>
-          <div class="stat-label">Recipes Stored</div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-item">5k+</div>
-          <div class="stat-label">Happy Users</div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-item">200+</div>
-          <div class="stat-label">Chefs & Admins</div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-item">50+</div>
-          <div class="stat-label">Features Added</div>
-        </div>
+    <div class="col-md-4">
+      <div class="feature-card">
+        <i class="bi bi-journal-text"></i>
+        <h5 class="mt-3">Manage Recipes</h5>
+        <p>Easily edit, view, and delete your recipes anytime — all in one place.</p>
       </div>
     </div>
-  </section>
 
-  <!-- User Stories Section -->
-  <section class="py-5 bg-light">
-    <div class="container text-center">
-      <h2 class="section-title">🗣️ User Stories</h2>
-      <div class="row g-4">
-        <div class="col-md-4">
-          <div class="user-story-card">
-            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Priya">
-            <h5>Priya Sharma</h5>
-            <p class="role">Home Chef</p>
-            <p class="story">"This app has made managing my recipes so easy! I love sharing them with friends and family."</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="user-story-card">
-            <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Rahul">
-            <h5>Rahul Verma</h5>
-            <p class="role">Food Blogger</p>
-            <p class="story">"Clean design and easy-to-use interface. Highly recommended for all food enthusiasts!"</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="user-story-card">
-            <img src="https://randomuser.me/api/portraits/women/22.jpg" alt="Sneha">
-            <h5>Sneha Kapoor</h5>
-            <p class="role">Restaurant Owner</p>
-            <p class="story">"The admin tools are fantastic! Managing recipes has never been this smooth."</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Featured Recipes Section -->
-  <section class="py-5 container">
-    <h2 class="section-title text-center">🍽️ Featured Recipes</h2>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="recipe-card">
-          <img src="https://images.unsplash.com/photo-1601050691317-69fa2b34a59d" alt="Recipe 1">
-          <div class="card-body">
-            <h5>Spaghetti Carbonara</h5>
-            <p>Classic Italian pasta with creamy sauce and bacon.</p>
-          </div>
+ <!-- Popular Recipes Carousel -->
+<section class="py-5 container">
+  <h2 class="section-title text-center">🔥 Popular Recipes</h2>
+  <div id="popularRecipesCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      {% for recipe in popular_recipes %}
+      <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %}">
+        <img src="{{ recipe.image_url }}" class="d-block w-100 rounded" alt="{{ recipe.title }}" style="height:500px; object-fit:cover;">
+        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+          <h5>{{ recipe.title }}</h5>
         </div>
       </div>
+      {% endfor %}
+    </div>
+
+    <!-- Carousel controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#popularRecipesCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#popularRecipesCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+
+    <!-- Carousel indicators -->
+    <div class="carousel-indicators mt-3">
+      {% for recipe in popular_recipes %}
+      <button type="button" data-bs-target="#popularRecipesCarousel" data-bs-slide-to="{{ loop.index0 }}" {% if loop.index0 == 0 %}class="active"{% endif %}></button>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 stats">
+  <div class="container">
+    <h2>Our Achievements</h2>
+    <div class="row text-center">
+      <div class="col-md-4 mb-4">
+        <div class="stat-item">{{ total_recipes }}</div>
+        <div class="stat-label">Recipes Stored</div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="stat-item">{{ total_users }}</div>
+        <div class="stat-label">Happy Users</div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="stat-item">{{ total_chefs }}</div>
+        <div class="stat-label">Chefs & Admins</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+ <!-- User Stories Section -->
+<section class="py-5 bg-light">
+  <div class="container text-center">
+    <h2 class="section-title">🗣️ User Stories</h2>
+    <div class="row g-4 justify-content-center">
+      {% for user in user_stories %}
       <div class="col-md-4">
-        <div class="recipe-card">
-          <img src="https://images.unsplash.com/photo-1604908177222-2b74494b7fd9" alt="Recipe 2">
-          <div class="card-body">
-            <h5>Grilled Chicken Salad</h5>
-            <p>Fresh vegetables topped with juicy grilled chicken.</p>
-          </div>
+        <div class="user-story-card">
+          <img src="{{ user.img }}" alt="{{ user.name }}">
+          <h5>{{ user.name }}</h5>
+          <p class="role">{{ user.role }}</p>
+          <p class="story">"{{ user.story }}"</p>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="recipe-card">
-          <img src="https://images.unsplash.com/photo-1603070444363-4973a2769c1e" alt="Recipe 3">
-          <div class="card-body">
-            <h5>Chocolate Brownie</h5>
-            <p>Rich and fudgy brownie perfect for dessert lovers.</p>
-          </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+<!-- Featured Recipes -->
+<section class="py-5 container">
+  <h2 class="section-title text-center">🍽️ Featured Recipes</h2>
+  <div class="row g-4">
+    {% for recipe in featured_recipes %}
+    <div class="col-md-4">
+      <div class="recipe-card">
+        <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" style="height:250px; object-fit:cover;">
+        <div class="card-body">
+          <h5>{{ recipe.title }}</h5>
+          <p>{{ recipe.category or 'Delicious Recipe' }}</p>
         </div>
       </div>
     </div>
-  </section>
+    {% endfor %}
+  </div>
+</section>
+
+
+
 
   <!-- CTA Section -->
   <section class="cta">
@@ -485,11 +466,35 @@
 
   <!-- Footer -->
   <footer>
-    <p class="mb-0">© 2025 Food & Recipe Manager | Developed by <b>Prithvi Roshan</b> 💚</p>
+    <p class="mb-0">© 2025 Food & Recipe Manager | Developed by <b>Prithvi Roshan & Team </b> 💚</p>
   </footer>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Stats Counter Animation
+    document.addEventListener('DOMContentLoaded', () => {
+      const counters = document.querySelectorAll('.display-4');
+      counters.forEach(counter => {
+        const updateCount = () => {
+          const target = +counter.innerText;
+          let count = 0;
+          const increment = target / 100;
+          const interval = setInterval(() => {
+            count += increment;
+            if (count >= target) {
+              counter.innerText = target;
+              clearInterval(interval);
+            } else {
+              counter.innerText = Math.ceil(count);
+            }
+          }, 20);
+        };
+        updateCount();
+      });
+    });
+  </script>
 </body>
 
 </html>
