@@ -19,7 +19,7 @@
 
 <div class="container mt-5">
 
-    <!-- ✅ USER APPROVALS -->
+    <!-- ✅ PENDING USER APPROVALS -->
     <h3>Pending User Approvals</h3>
 
     {% if pending_users %}
@@ -59,7 +59,7 @@
 
     <hr>
 
-    <!-- ✅ RECIPE APPROVAL REQUESTS -->
+    <!-- ✅ PENDING RECIPE APPROVALS -->
     <h3>Pending Recipe Approvals</h3>
 
     {% if pending_recipes %}
@@ -81,11 +81,6 @@
                 <td>{{ r["title"] }}</td>
                 <td>{{ r["category"] }}</td>
                 <td>{{ r["username"] }}</td>
-                <!-- <td>
-                    <a href="{{ url_for('view_recipe', recipe_id=r['id']) }}" class="btn btn-info btn-sm">
-                        View
-                    </a>                    
-                </td> -->
                 <td>
                     <form action="{{ url_for('admin_approve_recipe', recipe_id=r['id']) }}" method="POST">
                         <button class="btn btn-success btn-sm">Approve ✅</button>
@@ -100,18 +95,17 @@
             {% endfor %}
         </tbody>
     </table>
-
     {% else %}
         <p>No pending recipes ✅</p>
     {% endif %}
 
     <hr>
 
-    <!-- ❌ OPTIONAL — ONLY IF YOU SUPPORT DELETE REQUESTS -->
+    <!-- ✅ PENDING RECIPE DELETE REQUESTS -->
     {% if pending_deletes %}
     <h3>Pending Recipe Delete Requests</h3>
 
-    <table class="table table-bordered">
+    <table class="table table-bordered mt-3">
         <thead>
             <tr>
                 <th>Recipe</th>
@@ -127,18 +121,20 @@
                 <td>{{ r["username"] }}</td>
                 <td>
                     <form action="{{ url_for('admin_approve_delete', recipe_id=r['id']) }}" method="POST">
-                        <button class="btn btn-danger btn-sm">Delete</button>
+                        <button class="btn btn-success">Approve</button>
                     </form>
                 </td>
                 <td>
                     <form action="{{ url_for('admin_reject_delete', recipe_id=r['id']) }}" method="POST">
-                        <button class="btn btn-warning btn-sm">Reject</button>
+                        <button class="btn btn-danger">Reject</button>
                     </form>
-                </td>
+                </td>                
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+        <p>No pending delete requests ✅</p>
     {% endif %}
 
 </div>

@@ -118,13 +118,12 @@
                            class="btn btn-outline-primary w-50">✏️ Edit</a>
 
                         <!-- ✅ Delete Request Instead of Immediate Delete -->
-                        <form action="{{ url_for('delete_recipe', recipe_id=recipe['id']) }}"
-                              method="POST" class="w-50">
+                        <form action="{{ url_for('request_delete', recipe_id=recipe['id']) }}" method="POST" class="w-50">
                             <button class="btn btn-outline-danger w-100"
-                              onclick="return confirm('Request admin approval to delete this recipe?')">
+                                onclick="return confirm('Request admin approval to delete this recipe?')">
                                 🗑 Request Delete
                             </button>
-                        </form>
+                        </form>                        
                     </div>
 
                 </div>

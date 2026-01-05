@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <!-- Frosted glass form card -->
+            <div class="card p-4 shadow-lg" style="
+                backdrop-filter: blur(12px);
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 20px;
+                border: 1px solid rgba(255,255,255,0.25);
+            ">
+                <h2 class="text-center mb-4 text-white">Edit Profile</h2>
+                <form method="POST">
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label text-white">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ user['username'] }}" required>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label text-white">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ user['email'] }}" required>
+                        <small class="form-text text-light">If you change your email, an OTP will be sent for verification.</small>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2">Update Profile</button>
+                        <a href="{{ url_for('user_profile') }}" class="btn btn-secondary py-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background:
+            linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+            url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1600&q=80');
+        background-size: cover;
+        background-position: center;
+        min-height: 100vh;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        border: none;
+        background: rgba(255,255,255,0.25);
+        color: #fff;
+        padding: 12px 15px;
+    }
+
+    .form-control:focus {
+        background: rgba(255,255,255,0.35);
+        box-shadow: 0 0 10px #ffc107;
+        color: #fff;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #198754, #2eb872);
+        border: none;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(90deg, #2eb872, #198754);
+    }
+
+    .btn-secondary {
+        background: rgba(255,255,255,0.3);
+        color: #fff;
+        border-radius: 10px;
+        border: none;
+    }
+    .btn-secondary:hover {
+        background: rgba(255,255,255,0.45);
+        color: #fff;
+    }
+</style>
+{% endblock %}

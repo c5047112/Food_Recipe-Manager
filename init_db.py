@@ -3,12 +3,18 @@ from werkzeug.security import generate_password_hash
 
 DB_NAME = "recipe.db"
 
-# Connect to DB
+# -----------------------------
+# Connect to SQLite DB
+# -----------------------------
 conn = sqlite3.connect(DB_NAME)
 c = conn.cursor()
 
-# Create tables
-c.executescript("""
+# -----------------------------
+# Create Tables
+# -----------------------------
+
+# Users table
+c.execute("""
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
@@ -17,7 +23,10 @@ CREATE TABLE IF NOT EXISTS users (
     is_approved INTEGER DEFAULT 0,
     is_admin INTEGER DEFAULT 0
 );
+""")
 
+# Recipes table
+c.execute("""
 CREATE TABLE IF NOT EXISTS recipes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -31,7 +40,10 @@ CREATE TABLE IF NOT EXISTS recipes (
     status TEXT DEFAULT 'pending',
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
+""")
 
+# Reviews table
+c.execute("""
 CREATE TABLE IF NOT EXISTS reviews (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     recipe_id INTEGER NOT NULL,
@@ -44,7 +56,9 @@ CREATE TABLE IF NOT EXISTS reviews (
 );
 """)
 
-# Insert default admin if not exists
+# -----------------------------
+# Insert Default Admin
+# -----------------------------
 c.execute("SELECT * FROM users WHERE is_admin = 1")
 admin = c.fetchone()
 
@@ -56,7 +70,9 @@ if not admin:
 
 conn.commit()
 
-# Verify tables
+# -----------------------------
+# Verify Tables
+# -----------------------------
 c.execute("SELECT name FROM sqlite_master WHERE type='table';")
 tables = c.fetchall()
 print("Tables in DB:", tables)

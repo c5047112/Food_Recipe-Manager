@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Verify Email OTP{% endblock %}
+
+{% block content %}
+<!-- Floating background circles for effect -->
+<div class="circle one"></div>
+<div class="circle two"></div>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card p-4 shadow-lg otp-card">
+        <h2 class="text-white mb-3 text-center">Verify Your Email</h2>
+        <p class="text-light text-center mb-4">Enter the OTP sent to your new email to confirm your changes.</p>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label for="otp" class="form-label text-white">OTP</label>
+                <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter 6-digit OTP" required>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary py-2">Verify OTP</button>
+                <a href="{{ url_for('edit_user_profile') }}" class="btn btn-secondary py-2">Cancel</a>
+            </div>
+        </form>
+
+        <p class="mt-3 text-light text-center">
+            Didn't receive OTP? <a href="{{ url_for('edit_user_profile') }}">Resend</a>
+        </p>
+    </div>
+</div>
+
+<style>
+/* Use base.html background */
+body {
+    background: 
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+        url("https://images.unsplash.com/photo-1546069901-eacef0df6022?auto=format&fit=crop&w=1600&q=80");
+    background-size: cover;
+    background-position: center;
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Floating decorative circles */
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.3;
+    animation: float 8s ease-in-out infinite alternate;
+    z-index: 1;
+}
+.circle.one { width: 300px; height: 300px; background: #ffc107; top: -80px; left: -80px; }
+.circle.two { width: 350px; height: 350px; background: #1dbf73; bottom: -100px; right: -100px; animation-delay: 2s; }
+@keyframes float { from { transform: translateY(0); } to { transform: translateY(-40px); } }
+
+/* OTP card style */
+.otp-card {
+    position: relative;
+    z-index: 2;
+    width: 380px;
+    padding: 40px 30px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    text-align: center;
+    animation: popUp 0.8s ease forwards;
+    box-shadow: 0 8px 45px rgba(0,0,0,0.2);
+}
+@keyframes popUp {
+    0% { transform: translateY(40px) scale(0.95); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Form fields */
+.form-control {
+    border-radius: 12px;
+    border: none;
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    padding: 12px 15px;
+    text-align: center;
+}
+.form-control:focus {
+    background: rgba(255,255,255,0.35);
+    box-shadow: 0 0 12px #ffc107;
+    color: #fff;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(90deg, #198754, #2eb872);
+    border: none;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+.btn-primary:hover { transform: translateY(-2px); background: linear-gradient(90deg, #2eb872, #198754); }
+
+.btn-secondary {
+    background: rgba(255,255,255,0.3);
+    color: #fff;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.45); }
+
+/* Links */
+p a { color: #ffc107; font-weight: 600; text-decoration: none; }
+p a:hover { text-decoration: underline; }
+</style>
+{% endblock %}

@@ -85,7 +85,7 @@
     <div class="container-fluid">
       <a class="navbar-brand fw-bold text-white" href="#">🍴 Recipe Manager</a>
       <div class="d-flex align-items-center">
-        <span class="me-3 text-white welcome-text">Welcome, {{ username }}</span>
+        <span class="me-3 text-white welcome-text">Welcome, <a href="{{ url_for('user_profile') }}" class="me-3 text-white welcome-text">{{ username }}</a></span>
         <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
       </div>
     </div>
@@ -98,7 +98,7 @@
 
     <div class="row justify-content-center">
       <div class="col-md-5 mb-3">
-        <a href="{{ url_for('add_recipe') }}" class="btn dashboard-btn btn-success w-100 py-3 fs-5 shadow-sm">
+        <a href="{{ url_for('add_recipe_route') }}" class="btn dashboard-btn btn-success w-100 py-3 fs-5 shadow-sm">
           ➕ Add Recipe
         </a>
       </div>
